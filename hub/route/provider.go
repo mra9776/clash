@@ -48,7 +48,7 @@ func updateProvider(w http.ResponseWriter, r *http.Request) {
 
 func healthCheckProvider(w http.ResponseWriter, r *http.Request) {
 	provider := r.Context().Value(CtxKeyProvider).(provider.ProxyProvider)
-	provider.HealthCheck()
+	provider.HealthCheckExternalRequested()
 	render.NoContent(w, r)
 }
 

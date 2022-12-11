@@ -72,6 +72,25 @@ func (hc *HealthCheck) check() {
 	b.Wait()
 }
 
+func (hc *HealthCheck) checkConf(testCount int, concurrencyNum int, timeout int64) {
+	b, _ := batch.New(context.Background(), batch.WithConcurrencyNum(concurrencyNum))
+	for _, proxy := range hc.proxies {
+		p := proxy
+		b.Go(p.Name(), func() (any, error) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout))
+			defer cancel()
+			for i := 0; i < testCount; i++ {
+				_, err := p.URLTest(ctx, hc.url)
+				if err == nil {
+					break
+				}
+			}
+			return nil, nil
+		})
+	}
+	b.Wait()
+}
+
 func (hc *HealthCheck) close() {
 	hc.done <- struct{}{}
 }

@@ -52,6 +52,10 @@ func (pp *proxySetProvider) HealthCheck() {
 	pp.healthCheck.check()
 }
 
+func (pp *proxySetProvider) HealthCheckExternalRequested() {
+	pp.healthCheck.checkConf(3, 20, 10)
+}
+
 func (pp *proxySetProvider) Update() error {
 	elm, same, err := pp.fetcher.Update()
 	if err == nil && !same {
@@ -182,6 +186,10 @@ func (cp *compatibleProvider) Name() string {
 
 func (cp *compatibleProvider) HealthCheck() {
 	cp.healthCheck.check()
+}
+
+func (cp *compatibleProvider) HealthCheckExternalRequested() {
+	cp.healthCheck.checkConf(3, 20, 10)
 }
 
 func (cp *compatibleProvider) Update() error {

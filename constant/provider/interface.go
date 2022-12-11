@@ -70,6 +70,7 @@ type ProxyProvider interface {
 	// Commonly used in DialContext and DialPacketConn
 	Touch()
 	HealthCheck()
+	HealthCheckExternalRequested()
 }
 
 // Rule Type

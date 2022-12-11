@@ -11,6 +11,7 @@ import (
 	"github.com/Dreamacro/clash/adapter/outboundgroup"
 	"github.com/Dreamacro/clash/component/profile/cachefile"
 	C "github.com/Dreamacro/clash/constant"
+	"github.com/Dreamacro/clash/log"
 	"github.com/Dreamacro/clash/tunnel"
 
 	"github.com/go-chi/chi/v5"
@@ -121,6 +122,7 @@ func getProxyDelay(w http.ResponseWriter, r *http.Request) {
 	if err != nil || delay == 0 {
 		render.Status(r, http.StatusServiceUnavailable)
 		render.JSON(w, r, newError("An error occurred in the delay test"))
+		log.Debugln("URLTest failed for %s %s", proxy.Name(), err.Error())
 		return
 	}
 

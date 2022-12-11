@@ -12,6 +12,7 @@ import (
 	"github.com/Dreamacro/clash/common/queue"
 	"github.com/Dreamacro/clash/component/dialer"
 	C "github.com/Dreamacro/clash/constant"
+	"github.com/Dreamacro/clash/log"
 
 	"go.uber.org/atomic"
 )
@@ -103,6 +104,11 @@ func (p *Proxy) MarshalJSON() ([]byte, error) {
 // implements C.Proxy
 func (p *Proxy) URLTest(ctx context.Context, url string) (t uint16, err error) {
 	defer func() {
+		if err != nil {
+			log.Debugln("URLTest failed for %s %s", p.Name(), err.Error())
+		} else {
+			log.Debugln("URLTest ok for %s %d", p.Name(), t)
+		}
 		p.alive.Store(err == nil)
 		record := C.DelayHistory{Time: time.Now()}
 		if err == nil {
@@ -126,7 +132,7 @@ func (p *Proxy) URLTest(ctx context.Context, url string) (t uint16, err error) {
 	}
 	defer instance.Close()
 
-	req, err := http.NewRequest(http.MethodHead, url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return
 	}
@@ -155,6 +161,13 @@ func (p *Proxy) URLTest(ctx context.Context, url string) (t uint16, err error) {
 	if err != nil {
 		return
 	}
+
+	if !(resp.StatusCode >= 200 && resp.StatusCode < 400) {
+		err = fmt.Errorf("test status-code returned %d", resp.StatusCode)
+		resp.Body.Close()
+		return
+	}
+
 	resp.Body.Close()
 	t = uint16(time.Since(start) / time.Millisecond)
 	return

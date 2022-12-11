@@ -1,0 +1,70 @@
+port: 7990
+socks-port: 7991
+allow-lan: true
+mode: RULE
+log-level: debug
+external-controller: 0.0.0.0:9990
+# profile:
+# Store the `select` results in $HOME/.config/clash/.cache
+# store-selected: true
+
+dns:
+  enable: true
+  listen: 0.0.0.0:9953
+  #   # ipv6: false # when the false, response to AAAA questions will be empty
+  # default-nameserver:
+  # - 1.1.1.1
+  #     - 8.8.8.8
+  enhanced-mode: fake-ip # or redir-host (not recommended)
+  #   fake-ip-range: 198.18.0.1/16 # Fake IP addresses pool CIDR
+  use-hosts: true
+
+  #   # fake-ip-filter:
+  #   #   - '*.lan'
+  #   #   - localhost.ptlogin2.qq.com
+  hosts:
+    "doh.libredns.gr": "116.202.176.26"
+  nameserver:
+    - https://doh.libredns.gr/dns-query
+    # - 8.8.8.8 # default value
+#     - 178.22.122.100
+#     - 185.51.200.2
+# - tls://free.shecan.ir
+#     - 1.1.1.1
+#     # - tls://dns.rubyfish.cn:853 # DNS over TLS
+# - https://1.1.1.1/dns-query # DNS over HTTPS
+#     # - dhcp://en0 # dns from dhcp
+#     # - '8.8.8.8#en0'
+proxies:
+  - name: "vm3:7990"
+    type: http
+    server: 192.168.5.63
+    port: 7990
+
+  - name: "fodev.org"
+    type: http
+    server: fodev.org
+    port: 8118
+
+proxy-groups:
+  - name: manual_select
+    type: url-test
+    url: "https://www.google.com/gen_204"
+    interval: 500
+    proxies:
+      - "vm3:7990"
+      - "fodev.org"
+      - DIRECT
+
+rules:
+  - "IP-CIDR,10.0.0.0/8,DIRECT,no-resolve"
+  - "IP-CIDR,100.64.0.0/10,DIRECT,no-resolve"
+  - "IP-CIDR,127.0.0.0/8,DIRECT,no-resolve"
+  - "IP-CIDR,172.16.0.0/12,DIRECT,no-resolve"
+  - "IP-CIDR,192.168.0.0/16,DIRECT,no-resolve"
+  - "IP-CIDR,198.18.0.0/16,DIRECT,no-resolve"
+  - "IP-CIDR6,::1/128,DIRECT,no-resolve"
+  - "IP-CIDR6,fc00::/7,DIRECT,no-resolve"
+  - "IP-CIDR6,fe80::/10,DIRECT,no-resolve"
+  - "IP-CIDR6,fd00::/8,DIRECT,no-resolve"
+  - "MATCH,manual_select"

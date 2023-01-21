@@ -360,7 +360,8 @@ func parseProxies(cfg *RawConfig) (proxies map[string]C.Proxy, providersMap map[
 	for idx, mapping := range proxiesConfig {
 		proxy, err := adapter.ParseProxy(mapping)
 		if err != nil {
-			return nil, nil, fmt.Errorf("proxy %d: %w", idx, err)
+			log.Errorln("proxy %d: %w", idx, err)
+			continue
 		}
 
 		if _, exist := proxies[proxy.Name()]; exist {
@@ -486,7 +487,8 @@ func parseRules(cfg *RawConfig, proxies map[string]C.Proxy) ([]C.Rule, error) {
 
 		parsed, parseErr := R.ParseRule(rule[0], payload, target, params)
 		if parseErr != nil {
-			return nil, fmt.Errorf("rules[%d] [%s] error: %s", idx, line, parseErr.Error())
+			log.Errorln("rules[%d] [%s] error: %s", idx, line, parseErr.Error())
+			continue
 		}
 
 		rules = append(rules, parsed)

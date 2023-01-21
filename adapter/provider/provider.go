@@ -11,6 +11,7 @@ import (
 	"github.com/Dreamacro/clash/adapter"
 	C "github.com/Dreamacro/clash/constant"
 	types "github.com/Dreamacro/clash/constant/provider"
+	"github.com/Dreamacro/clash/log"
 
 	"gopkg.in/yaml.v3"
 )
@@ -137,7 +138,8 @@ func NewProxySetProvider(name string, interval time.Duration, filter string, veh
 			}
 			proxy, err := adapter.ParseProxy(mapping)
 			if err != nil {
-				return nil, fmt.Errorf("proxy %d error: %w", idx, err)
+				log.Errorln("proxy %d error: %w", idx, err)
+				continue
 			}
 			proxies = append(proxies, proxy)
 		}
